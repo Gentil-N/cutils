@@ -2,7 +2,6 @@
 #define __RAM_H__
 
 #include <stddef.h>
-#include "../err/err.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -13,20 +12,6 @@ void *_ram_malloc(size_t size, const char *file, int line);
 void *_ram_calloc(size_t nmemb, size_t size, const char *file, int line);
 void *_ram_realloc(void *ptr, size_t size);
 void _ram_free(void *ptr);
-
-typedef enum RamErrorCode
-{
-    RAM_ERROR_NOPE = 0,
-    RAM_ERROR_LABEL_ALLOCATION_FAILED = 1,
-    RAM_ERROR_MUTEX_FAILED = 2,
-    RAM_ERROR_LABEL_NOT_VALID = 3,
-} RamErrorCode;
-
-ERR_DEFINE(ram);
-
-typedef void (*ram_trace_fn)(void *ptr, const char *file, int line);
-
-void ram_trace(ram_trace_fn fn);
 
 #define ram_malloc(size) _ram_malloc(size, __FILE__, __LINE__)
 #define ram_calloc(nmemb, size) _ram_calloc(nmemb, size, __FILE__, __LINE__)
