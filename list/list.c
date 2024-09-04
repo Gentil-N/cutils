@@ -20,14 +20,11 @@
 struct ListGeneric
 {
     size_t size;
-    size_t _capacity;
     void *data;
+    size_t _capacity;
 };
 
 static const size_t INIT_CAPACITY = 1;
-
-#define meta_to_list(list) (void *)(&(list[1]));
-#define list_to_meta(list) (&((struct ListGeneric *)(list))[-1])
 
 void grow_list_if_needed(struct ListGeneric *generic, size_t elem_byte_size)
 {

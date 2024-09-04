@@ -3,6 +3,8 @@
 #include <stdarg.h>
 #include <assert.h>
 
+//#include "../ctools.h"
+
 #include "../tracker/trk.h"
 #include "../log/log.h"
 #include "../ram/ram.h"
@@ -91,6 +93,7 @@ int main()
 
     int a = 1;
     list_int_append(&list_a, &a);
+    list_a.data[0] = 2;
     printf("%lu %i\n", list_a.size, list_a.data[10]);
     list_List_int_append(&list_c, &list_a);
     printf("%lu %lu\n", list_c.size, list_c.data[10].size);
