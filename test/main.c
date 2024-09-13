@@ -3,12 +3,7 @@
 #include <stdarg.h>
 #include <assert.h>
 
-//#include "../ctools.h"
-
-#include "../tracker/trk.h"
-#include "../log/log.h"
-#include "../ram/ram.h"
-#include "../list/list.h"
+#include "../ctools.h"
 
 /*void error_callback(int level, int code, const char *file, int line, const char *msg)
 {
@@ -88,7 +83,7 @@ int main()
     struct List_int list_b = list_create(int, 10);
     struct List_List_int list_c = list_create(List_int, 10);
 
-    assert(trk_trace(trace) == TRK_RESULT_OK);
+    assert(trk_trace(trace) == 0);
     printf("haha\n");
 
     int a = 1;
@@ -102,7 +97,7 @@ int main()
     list_int_destroy(&list_b);
     list_int_destroy(&list_a);
 
-    assert(trk_trace(trace) == TRK_RESULT_OK);
+    assert(trk_trace(trace) == 0);
     printf("haha\n");
 
     return 0;

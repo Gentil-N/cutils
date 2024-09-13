@@ -3,11 +3,22 @@
 
 #include <stdlib.h>
 #include <stddef.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+/*
+*   MISCELLANEOUS
+*/
+#define for_loop(index_name, limit) for (size_t index_name = 0; index_name < limit; ++index_name)
+
+/*
+*   STRING
+*/
+#define filename(path) strrchr(path, '/') ? strrchr(path, '/') + 1 : path
 
 /*
 *   LOGGER
@@ -64,44 +75,46 @@ int _##suffix##_throw_##type(int level, int code, const char *file, int line, co
 void _list_generic_create(void *list, size_t size, size_t elem_byte_size, const char *file, int line);
 void _list_generic_destroy(void *list);
 void _list_generic_resize(void *list, size_t elem_byte_size, size_t new_size);
-void _list_generic_append(void *list, size_t elem_byte_size, void *elem);
+void _list_generic_append(void *list, size_t elem_byte_size, const void *elem);
 void _list_generic_remove(void *list, size_t elem_byte_size, size_t index);
-void _list_generic_insert(void *list, size_t elem_byte_size, size_t index, void *elem);
+void _list_generic_insert(void *list, size_t elem_byte_size, size_t index, const void *elem);
 
 #define LIST(type)                                                                                  \
 struct List_##type                                                                                  \
 {                                                                                                   \
-    const size_t size;                                                                              \
+    size_t size;                                                                                    \
     type *data;                                                                                     \
+    size_t _capacity;                                                                               \
 };                                                                                                  \
-struct List_##type _list_##type##_create(size_t size, const char *file, int line)                   \
+static inline struct List_##type _list_##type##_create(size_t size, const char *file, int line)     \
 {                                                                                                   \
     struct List_##type list = {0};                                                                  \
     _list_generic_create(&list, size, sizeof(type), file, line);                                    \
     return list;                                                                                    \
 }                                                                                                   \
-void list_##type##_destroy(struct List_##type *list)                                                \
+static inline void list_##type##_destroy(struct List_##type *list)                                  \
 {                                                                                                   \
     _list_generic_destroy(list);                                                                    \
 }                                                                                                   \
-void list_##type##_resize(struct List_##type *list, size_t new_size)                                \
+static inline void list_##type##_resize(struct List_##type *list, size_t new_size)                  \
 {                                                                                                   \
     _list_generic_resize(list, sizeof(type), new_size);                                             \
 }                                                                                                   \
-void list_##type##_append(struct List_##type *list, type *elem)                                     \
+static inline void list_##type##_append(struct List_##type *list, const type *elem)                 \
 {                                                                                                   \
     _list_generic_append(list, sizeof(type), elem);                                                 \
 }                                                                                                   \
-void list_##type##_remove(struct List_##type *list, size_t index)                                   \
+static inline void list_##type##_remove(struct List_##type *list, size_t index)                     \
 {                                                                                                   \
     _list_generic_remove(list, sizeof(type), index);                                                \
 }                                                                                                   \
-void list_##type##_insert(struct List_##type *list, size_t index, type *elem)                       \
+static inline void list_##type##_insert(struct List_##type *list, size_t index, const type *elem)   \
 {                                                                                                   \
     _list_generic_insert(list, sizeof(type), index, elem);                                          \
 }                                                                                                   \
 
 #define list_create(type, size) _list_##type##_create(size, __FILE__, __LINE__)
+#define for_list(index_name, list) for (size_t index_name = 0; index_name < list.size; ++index_name)
 
 /*
 *   RAM
@@ -123,32 +136,12 @@ void _ram_free(void *ptr);
 *   TRACKER
 */
 
-enum TrkResult
-{
-    TRK_RESULT_OK = 0,
-    TRK_RESULT_ERROR_ADDRESS_NOT_FOUND = 1,
-    TRK_RESULT_ERROR_OUT_OF_MEMORY = 2,
-    TRK_RESULT_ERROR_INTERNAL_PTHREAD = 3,
-};
-
 typedef void (*trk_trace_fn)(void *address, const char *file, int line);
 
-enum TrkResult _trk_register(void *address, const char *file, int line);
-enum TrkResult _trk_unregister(void *address);
-enum TrkResult _trk_change_register(void *old_address, void *new_address);
-enum TrkResult _trk_trace(trk_trace_fn fn);
-
-#ifndef NDEBUG
-#define trk_register(address, file, line) _trk_register(address, file, line)
-#define trk_unregister(address) _trk_unregister(address)
-#define trk_change_register(old_address, new_address) _trk_change_register(old_address, new_address)
-#define trk_trace(fn) _trk_trace(fn)
-#else
-#define trk_register(address, file, line)
-#define trk_unregister(address)
-#define trk_change_register(old_address, new_address)
-#define trk_trace(fn)
-#endif // NDEBUG
+int trk_register(void *address, const char *file, int line);
+int trk_unregister(void *address);
+int trk_change_register(void *old_address, void *new_address);
+int trk_trace(trk_trace_fn fn);
 
 #ifdef __cplusplus
 }
