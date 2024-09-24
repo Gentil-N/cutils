@@ -1,24 +1,24 @@
-#include "ctools.h"
+#include "cutils_base.h"
 
 #include <assert.h>
 #include <stdint.h>
 #include <pthread.h>
 #include <string.h>
 
-#ifndef CTOOLS_MALLOC
-#define CTOOLS_MALLOC malloc
+#ifndef CUTILS_MALLOC
+#define CUTILS_MALLOC malloc
 #endif
 
-#ifndef CTOOLS_CALLOC
-#define CTOOLS_CALLOC calloc
+#ifndef CUTILS_CALLOC
+#define CUTILS_CALLOC calloc
 #endif
 
-#ifndef CTOOLS_REALLOC
-#define CTOOLS_REALLOC realloc
+#ifndef CUTILS_REALLOC
+#define CUTILS_REALLOC realloc
 #endif
 
-#ifndef CTOOLS_FREE
-#define CTOOLS_FREE free
+#ifndef CUTILS_FREE
+#define CUTILS_FREE free
 #endif
 
 /*
@@ -39,7 +39,7 @@ void grow_list_if_needed(struct ListGeneric *generic, size_t elem_byte_size)
     if (generic->_capacity < generic->size)
     {
         generic->_capacity *= 2;
-        void *new_data = CTOOLS_REALLOC(generic->data, generic->_capacity * elem_byte_size);
+        void *new_data = CUTILS_REALLOC(generic->data, generic->_capacity * elem_byte_size);
         assert(trk_change_register(generic->data, new_data) == 0);
         generic->data = new_data;
     }
@@ -50,7 +50,7 @@ void reduce_list_if_needed(struct ListGeneric *generic, size_t elem_byte_size)
     if (generic->_capacity > generic->size * 2 && generic->_capacity > 1)
     {
         generic->_capacity /= 2;
-        void *new_data = CTOOLS_REALLOC(generic->data, generic->_capacity * elem_byte_size);
+        void *new_data = CUTILS_REALLOC(generic->data, generic->_capacity * elem_byte_size);
         assert(trk_change_register(generic->data, new_data) == 0);
         generic->data = new_data;
     }
@@ -61,7 +61,7 @@ void _list_generic_create(void *list, size_t size, size_t elem_byte_size, const 
     struct ListGeneric *generic = (struct ListGeneric *)list;
     generic->size = size;
     generic->_capacity = ((size == 0) ? LIST_INIT_CAPACITY : size);
-    generic->data = CTOOLS_MALLOC(generic->_capacity * elem_byte_size);
+    generic->data = CUTILS_MALLOC(generic->_capacity * elem_byte_size);
     assert(trk_register(generic->data, file, line) == 0);
 }
 
@@ -69,7 +69,7 @@ void _list_generic_destroy(void *list)
 {
     struct ListGeneric *generic = (struct ListGeneric *)list;
     assert(trk_unregister(generic->data) == 0);
-    CTOOLS_FREE(generic->data);
+    CUTILS_FREE(generic->data);
 }
 
 void _list_generic_resize(void *list, size_t elem_byte_size, size_t new_size)
@@ -131,7 +131,7 @@ size_t _list_generic_find(void *list, size_t elem_byte_size, const void *elem)
 
 void *_ram_malloc(size_t size, const char *file, int line)
 {
-    void *ptr = CTOOLS_MALLOC(size);
+    void *ptr = CUTILS_MALLOC(size);
 #ifndef NDEBUG
     assert(trk_register(ptr, file, line) == 0);
 #endif
@@ -140,7 +140,7 @@ void *_ram_malloc(size_t size, const char *file, int line)
 
 void *_ram_calloc(size_t nmemb, size_t size, const char *file, int line)
 {
-    void *ptr = CTOOLS_CALLOC(nmemb, size);
+    void *ptr = CUTILS_CALLOC(nmemb, size);
 #ifndef NDEBUG
     assert(trk_register(ptr, file, line) == 0);
 #endif
@@ -149,7 +149,7 @@ void *_ram_calloc(size_t nmemb, size_t size, const char *file, int line)
 
 void *_ram_realloc(void *ptr, size_t size)
 {
-    void *new_ptr = CTOOLS_REALLOC(ptr, size);
+    void *new_ptr = CUTILS_REALLOC(ptr, size);
 #ifndef NDEBUG
     assert(trk_change_register(ptr, new_ptr) == 0);
 #endif
@@ -158,7 +158,7 @@ void *_ram_realloc(void *ptr, size_t size)
 
 void _ram_free(void *ptr)
 {
-    CTOOLS_FREE(ptr);
+    CUTILS_FREE(ptr);
 #ifndef NDEBUG
     assert(trk_unregister(ptr) == 0);
 #endif
@@ -208,7 +208,7 @@ int mutex_unlock_and_destroy()
 
 struct MemoryLabel *create_memory_label_generic(void *ptr, const char *file, int line, struct MemoryLabel *prev, struct MemoryLabel *next)
 {
-    struct MemoryLabel *mem_label = CTOOLS_MALLOC(sizeof(struct MemoryLabel));
+    struct MemoryLabel *mem_label = CUTILS_MALLOC(sizeof(struct MemoryLabel));
     if (mem_label == NULL)
     {
         return NULL;
@@ -282,10 +282,10 @@ int trk_unregister(void *address)
     {
         TRK_TAIL = mem_label->prev;
     }
-    CTOOLS_FREE(mem_label);
+    CUTILS_FREE(mem_label);
     if (TRK_TAIL == TRK_HEAD)
     {
-        CTOOLS_FREE(TRK_HEAD);
+        CUTILS_FREE(TRK_HEAD);
         TRK_HEAD = NULL;
         TRK_TAIL = NULL;
         if (mutex_unlock_and_destroy() != 0) return 1;

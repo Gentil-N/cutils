@@ -1,5 +1,5 @@
-#ifndef __CTOOLS_H__
-#define __CTOOLS_H__
+#ifndef __CUTILS_BASE_H__
+#define __CUTILS_BASE_H__
 
 #include <stdlib.h>
 #include <stddef.h>
@@ -162,4 +162,4 @@ int trk_trace(trk_trace_fn fn);
 }
 #endif
 
-#endif // __CTOOLS_H__
+#endif // __CUTILS_BASE_H__
