@@ -1,6 +1,7 @@
 #include "ctools.h"
 
 #include <assert.h>
+#include <stdint.h>
 #include <pthread.h>
 #include <string.h>
 
@@ -110,6 +111,16 @@ void _list_generic_insert(void *list, size_t elem_byte_size, size_t index, const
     grow_list_if_needed(generic, elem_byte_size);
     memcpy(generic->data + elem_byte_size * (index + 1), generic->data + elem_byte_size * index, elem_byte_size * (generic->size - 1 - index));
     memcpy(generic->data + elem_byte_size * index, elem, elem_byte_size);
+}
+
+size_t _list_generic_find(void *list, size_t elem_byte_size, const void *elem)
+{
+    struct ListGeneric *generic = (struct ListGeneric *)list;
+    for (size_t i = 0; i < generic->size; ++i)
+    {
+        if (memcmp((void*)((size_t)generic->data + i * elem_byte_size), elem, elem_byte_size) == 0) return i;
+    }
+    return SIZE_MAX;
 }
 
 /*

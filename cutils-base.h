@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -14,6 +15,9 @@ extern "C"
 *   MISCELLANEOUS
 */
 #define for_loop(index_name, limit) for (size_t index_name = 0; index_name < limit; ++index_name)
+#define min(x, y) (((x) < (y)) ? (x) : (y))
+#define max(x, y) (((x) > (y)) ? (x) : (y))
+#define clamp(x, low, up) min((up), max((x), (low)))
 
 /*
 *   STRING
@@ -78,6 +82,7 @@ void _list_generic_resize(void *list, size_t elem_byte_size, size_t new_size);
 void _list_generic_append(void *list, size_t elem_byte_size, const void *elem);
 void _list_generic_remove(void *list, size_t elem_byte_size, size_t index);
 void _list_generic_insert(void *list, size_t elem_byte_size, size_t index, const void *elem);
+size_t _list_generic_find(void *list, size_t elem_byte_size, const void *elem);
 
 #define LIST(type)                                                                                  \
 struct List_##type                                                                                  \
@@ -111,6 +116,16 @@ static inline void list_##type##_remove(struct List_##type *list, size_t index) 
 static inline void list_##type##_insert(struct List_##type *list, size_t index, const type *elem)   \
 {                                                                                                   \
     _list_generic_insert(list, sizeof(type), index, elem);                                          \
+}                                                                                                   \
+static inline size_t list_##type##_find(struct List_##type *list, const type *elem)                 \
+{                                                                                                   \
+    return _list_generic_find(list, sizeof(type), elem);                                            \
+}                                                                                                   \
+static inline size_t list_##type##_remove_on_finding(struct List_##type *list, const type *elem)    \
+{                                                                                                   \
+    size_t index = _list_generic_find(list, sizeof(type), elem);                                    \
+    if (index != SIZE_MAX) _list_generic_remove(list, sizeof(type), index);                         \
+    return index;                                                                                   \
 }                                                                                                   \
 
 #define list_create(type, size) _list_##type##_create(size, __FILE__, __LINE__)
