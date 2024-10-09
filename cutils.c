@@ -124,12 +124,12 @@ size_t _list_generic_find(void *list, size_t elem_byte_size, const void *elem)
 }
 
 /*
-*   RAM
+*   MEM
 */
 
 #include <stdio.h>
 
-void *_ram_malloc(size_t size, const char *file, int line)
+void *_mem_malloc(size_t size, const char *file, int line)
 {
     void *ptr = CUTILS_MALLOC(size);
 #ifndef NDEBUG
@@ -138,7 +138,7 @@ void *_ram_malloc(size_t size, const char *file, int line)
     return ptr;
 }
 
-void *_ram_calloc(size_t nmemb, size_t size, const char *file, int line)
+void *_mem_calloc(size_t nmemb, size_t size, const char *file, int line)
 {
     void *ptr = CUTILS_CALLOC(nmemb, size);
 #ifndef NDEBUG
@@ -147,7 +147,7 @@ void *_ram_calloc(size_t nmemb, size_t size, const char *file, int line)
     return ptr;
 }
 
-void *_ram_realloc(void *ptr, size_t size)
+void *_mem_realloc(void *ptr, size_t size)
 {
     void *new_ptr = CUTILS_REALLOC(ptr, size);
 #ifndef NDEBUG
@@ -156,7 +156,7 @@ void *_ram_realloc(void *ptr, size_t size)
     return new_ptr;
 }
 
-void _ram_free(void *ptr)
+void _mem_free(void *ptr)
 {
     CUTILS_FREE(ptr);
 #ifndef NDEBUG
